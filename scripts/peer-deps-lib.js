@@ -23,7 +23,7 @@ function isInstalled(packageName) {
 
 function installPackages(packages) {
   const packagesString = packages.join(" ");
-  return runSync(`yarn add ${packagesString}}`);
+  return runSync(`yarn add ${packagesString}`);
 }
 
 function installPackage(package) {
