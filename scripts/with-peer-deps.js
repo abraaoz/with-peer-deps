@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const chalk = require("chalk");
 const { addOrUpgradePkgAndSyncPeerDeps } = require("./add-or-upgrade-pkg-and-sync-peer-deps");
 const { removePkgWithPeerDeps } = require("./remove-pkg-with-peer-deps");

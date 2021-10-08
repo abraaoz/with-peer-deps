@@ -1,12 +1,12 @@
 {
   "name": "with-peer-deps",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "repository": "https://github.com/abraaoz/with-peer-deps",
   "author": "abraao.zaidan@gmail.com",
   "license": "MIT",
   "private": false,
   "bin": {
-    "with-peer-deps": "./scripts/with-peer-deps.js"
+    "with-peer-deps": "node ./scripts/with-peer-deps.js"
   },
   "dependencies": {
     "chalk": "^4.1.2",
