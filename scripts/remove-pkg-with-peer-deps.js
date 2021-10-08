@@ -4,7 +4,9 @@ const { removePackages } = require('./peer-deps-lib');
 
 function removePkgWithPeerDeps(packageName) {
   try {
-    const currentPackageJson = require(`${packageName}/package.json`);
+    const currentPackageJsonPath = `${process.cwd()}/node_modules/${packageName}/package.json`;
+    console.log(`Trying to read the file ${chalk.yellow(currentPackageJsonPath)}`);
+    const currentPackageJson = JSON.parse(fs.readFileSync(currentPackageJsonPath));
     const packagesToRemove = [
       packageName,
       ...Object.keys(currentPackageJson.peerDependencies),

@@ -2,11 +2,6 @@ const chalk = require("chalk");
 const { spawnSync } = require("child_process");
 const spawnargs = require("spawn-args");
 
-function debug() {
-  console.log("__dirname =", __dirname);
-  console.log("process.cwd() =", process.cwd());
-}
-
 function runSync(cmd, verbose = true) {
   console.log(`Running ${chalk.yellow(cmd)}`);
   const args = spawnargs(cmd);
@@ -28,7 +23,7 @@ function isInstalled(packageName) {
 
 function installPackages(packages) {
   const packagesString = packages.join(" ");
-  return runSync(`yarn add ${packagesString} --cwd ${process.cwd()}`);
+  return runSync(`yarn add ${packagesString}}`);
 }
 
 function installPackage(package) {
@@ -63,7 +58,7 @@ function removePackages(packages) {
     return;
   }
   const packagesString = installedPackages.join(" ");
-  return runSync(`yarn remove ${packagesString} --cwd ${process.cwd()}`);
+  return runSync(`yarn remove ${packagesString}}`);
 }
 
 function getPackageListWithVersions(packagesObj) {
@@ -73,7 +68,6 @@ function getPackageListWithVersions(packagesObj) {
 }
 
 module.exports = {
-  debug,
   runSync,
   isInstalled,
   installPackages,
