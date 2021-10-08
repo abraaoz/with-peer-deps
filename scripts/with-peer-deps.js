@@ -3,7 +3,7 @@ const chalk = require("chalk");
 const { addOrUpgradePkgAndSyncPeerDeps } = require("./add-or-upgrade-pkg-and-sync-peer-deps");
 const { removePkgWithPeerDeps } = require("./remove-pkg-with-peer-deps");
 
-function withPeerDeps() {
+module.exports = function withPeerDeps() {
   const command = process.argv[2];
   if(command !== 'add' && command !== 'remove') {
     console.log(`The command ${chalk.red(command)} should be ${chalk.green('add')} or ${chalk.green('remove')}`);
@@ -28,4 +28,4 @@ function withPeerDeps() {
   }
 }
 
-withPeerDeps();
+console.log('process.cwd()=', process.cwd());
