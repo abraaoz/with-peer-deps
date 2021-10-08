@@ -1,12 +1,8 @@
 #!/usr/bin/env node
 const chalk = require("chalk");
 const { addOrUpgradePkgAndSyncPeerDeps } = require("./add-or-upgrade-pkg-and-sync-peer-deps");
+const { debug } = require("./peer-deps-lib");
 const { removePkgWithPeerDeps } = require("./remove-pkg-with-peer-deps");
-
-function debug() {
-  console.log('__dirname =', __dirname);
-  console.log('process.cwd() =', process.cwd());
-}
 
 function withPeerDeps() {
   debug();
@@ -34,7 +30,5 @@ function withPeerDeps() {
       break;
   }
 }
-
-module.exports = debug;
 
 withPeerDeps();

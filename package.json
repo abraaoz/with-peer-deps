@@ -1,11 +1,10 @@
 {
   "name": "with-peer-deps",
-  "version": "0.0.14",
+  "version": "0.0.15",
   "repository": "https://github.com/abraaoz/with-peer-deps",
   "author": "abraao.zaidan@gmail.com",
   "license": "MIT",
   "private": false,
-  "index": "./scripts/with-peer-deps.js",
   "bin": {
     "with-peer-deps": "./scripts/with-peer-deps.js"
   },

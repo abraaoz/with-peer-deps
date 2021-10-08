@@ -2,11 +2,15 @@ const chalk = require("chalk");
 const { spawnSync } = require("child_process");
 const spawnargs = require("spawn-args");
 
+function debug() {
+  console.log("__dirname =", __dirname);
+  console.log("process.cwd() =", process.cwd());
+}
+
 function runSync(cmd, verbose = true) {
   console.log(`Running ${chalk.yellow(cmd)}`);
   const args = spawnargs(cmd);
   const process = spawnSync(args[0], args.slice(1), {
-    shell: true,
     encoding: "utf8",
   });
   if (verbose) {
@@ -68,6 +72,7 @@ function getPackageListWithVersions(packagesObj) {
 }
 
 module.exports = {
+  debug,
   runSync,
   isInstalled,
   installPackages,
