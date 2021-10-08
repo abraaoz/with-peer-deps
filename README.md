@@ -30,20 +30,20 @@ When we want to install an X dependency that contains several peerDependencies i
 
 `my-mobile-app` -> package.json:
 
-```json
+```javascript
 {
   "name": "my-mobile-app",
   "version": "0.0.1",
   "dependencies": {
     "my-design-system": "0.0.3",
-    "react-native-linear-gradient": "2.5.6" // <-- this will be automatically appended when you add my-design-system using `with-peer-deps add my-design-system`
+    "react-native-linear-gradient": "2.5.6" // <-- this will be automatically appended when you add my-design-system using `npx -p with-peer-deps@latest add my-design-system`
   }
 }
 ```
 
 `my-design-system` -> package.json:
 
-```json
+```javascript
 {
   "name": "my-design-system",
   "version": "0.0.3",
