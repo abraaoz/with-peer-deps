@@ -10,14 +10,14 @@ function addOrUpgradePkgAndSyncPeerDeps() {
   let packageName = process.argv[2];
 
   if (!packageName) {
-    console.log(chalk.bgRed('É necessário especificar o nome do pacote'));
+    console.log(chalk.bgRed('The package name is required'));
     process.exitCode = 1;
     return;
   }
 
   const latestPackageVersion = runSync(`npm info ${packageName} version`).stdout.trim();
   if (latestPackageVersion === '') {
-    console.log(chalk.bgRed(`O pacote ${packageName} não foi encontrado nos repositórios disponíveis`));
+    console.log(chalk.bgRed(`The package ${packageName} was not found in the available repositories`));
     process.exitCode = 2;
     return;
   }
@@ -40,15 +40,15 @@ function addOrUpgradePkgAndSyncPeerDeps() {
     const currentPackageNameWithVersion = `${packageName}@${currentPackageJson.version}`;
     const packagesToRemove = getPackageListWithVersions(currentPackageJson.peerDependencies).filter((package) => !packagesToInstall.includes(package));
     if (requestedPackageVersion === currentPackageJson.version) {
-      console.log(`O pacote ${chalk.green(currentPackageNameWithVersion)} já está na versão solicitada`);
+      console.log(`The package ${chalk.green(currentPackageNameWithVersion)} is already in the requested version`);
       if (packagesToRemove.length > 0) {
-        console.log('Removendo peerDependencies inconsistentes...');
+        console.log('Removing inconsistent peerDependencies...');
         removePackages(packagesToRemove);
       }
     } else {
-      let message = `Versão divergente do pacote ${chalk.red(currentPackageNameWithVersion)} detectada, removendo o pacote`;
+      let message = `A divergent version of the package ${chalk.red(currentPackageNameWithVersion)} has been detected, removing the package`;
       if (packagesToRemove.length > 0) {
-        message += ' e peerDependencies inconsistentes...';
+        message += ' and inconsistent peerDependencies...';
       }
       console.log(message);
       packagesToRemove.push(currentPackageNameWithVersion);
@@ -59,7 +59,7 @@ function addOrUpgradePkgAndSyncPeerDeps() {
     installPackage(requestedPackageNameWithVersion);
   } finally {
     if (packagesToInstall.length > 0) {
-      console.log(`Instalando peerDependencies do pacote ${chalk.green(requestedPackageNameWithVersion)}...`);
+      console.log(`Installing package ${chalk.green(requestedPackageNameWithVersion)} peerDependencies...`);
       installPackages(packagesToInstall);
     }
   }

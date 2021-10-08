@@ -7,7 +7,7 @@ function removePkgWithPeerDeps() {
   const packageName = process.argv[2];
 
   if (!packageName) {
-    console.log(chalk.bgRed('É necessário especificar o nome do pacote'));
+    console.log(chalk.bgRed('The package name is required'));
     process.exitCode = 1;
     return;
   }
@@ -20,7 +20,7 @@ function removePkgWithPeerDeps() {
     ];
     removePackages(packagesToRemove);
   } catch {
-    console.log(`O pacote ${chalk.red(packageName)} não foi encontrado na pasta node_modules. Execute o comando ${chalk.yellow('yarn')} e tente novamente.`);
+    console.log(`The package ${chalk.red(packageName)} was not found in the node_modules folder. Run the command ${chalk.yellow('yarn')} and try again.`);
   }
 }
 

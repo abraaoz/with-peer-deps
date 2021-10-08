@@ -1,13 +1,13 @@
-const chalk = require('chalk');
-const { spawnSync } = require('child_process');
-const spawnargs = require('spawn-args');
+const chalk = require("chalk");
+const { spawnSync } = require("child_process");
+const spawnargs = require("spawn-args");
 
 function runSync(cmd, verbose = true) {
   console.log(`Running ${chalk.yellow(cmd)}`);
   const args = spawnargs(cmd);
   const process = spawnSync(args[0], args.slice(1), {
     shell: true,
-    encoding: 'utf8',
+    encoding: "utf8",
   });
   if (verbose) {
     console.log(chalk.green(process.stdout));
@@ -17,22 +17,22 @@ function runSync(cmd, verbose = true) {
 
 function isInstalled(packageName) {
   const npmList = runSync(`npm list ${packageName} --depth=0`, false);
-  const notInstalled = npmList.stdout.trim().endsWith('`-- (empty)');
+  const notInstalled = npmList.stdout.trim().endsWith("`-- (empty)");
   return !notInstalled;
 }
 
 function installPackages(packages) {
-  const packagesString = packages.join(' ');
+  const packagesString = packages.join(" ");
   return runSync(`yarn add ${packagesString}`);
 }
 
 function installPackage(package) {
-  console.log(`Instalando o pacote ${chalk.yellow(package)}...`);
+  console.log(`Installing the package ${chalk.yellow(package)}...`);
   installPackages([package]);
 }
 
 function getNameAndVersion(package) {
-  const hasVersion = new RegExp('^(.+)@(.+?)$');
+  const hasVersion = new RegExp("^(.+)@(.+?)$");
   const hasVersionResult = hasVersion.exec(package);
   if (hasVersionResult) {
     return {
@@ -47,22 +47,24 @@ function getNameAndVersion(package) {
 }
 
 function removePackages(packages) {
-  console.log('Verificando se os pacotes a serem removidos estão presentes...');
+  console.log("Checking the presence of the packages to be removed...");
   const packagesWithoutVersions = packages.map((package) => {
     const { name } = getNameAndVersion(package);
     return name;
   });
   const installedPackages = packagesWithoutVersions.filter(isInstalled);
   if (installedPackages.length === 0) {
-    console.log('Todos os pacotes já foram removidos');
+    console.log("All packages have already been removed");
     return;
   }
-  const packagesString = installedPackages.join(' ');
+  const packagesString = installedPackages.join(" ");
   return runSync(`yarn remove ${packagesString}`);
 }
 
 function getPackageListWithVersions(packagesObj) {
-  return Object.entries(packagesObj).map((package) => `${package[0]}@${package[1]}`);
+  return Object.entries(packagesObj).map(
+    (package) => `${package[0]}@${package[1]}`
+  );
 }
 
 module.exports = {
