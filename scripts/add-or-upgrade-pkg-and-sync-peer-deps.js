@@ -27,7 +27,7 @@ function addOrUpgradePkgAndSyncPeerDeps(packageName) {
   const peerDeps = JSON.parse(toJson(npmInfo.stdout));
   const packagesToInstall = getPackageListWithVersions(peerDeps);
   try {
-    const currentPackageJson = require(`${packageName}/package.json`);
+    const currentPackageJson = require(`${process.cwd()}/node_modules/${packageName}/package.json`);
     const currentPackageNameWithVersion = `${packageName}@${currentPackageJson.version}`;
     const packagesToRemove = getPackageListWithVersions(currentPackageJson.peerDependencies).filter((package) => !packagesToInstall.includes(package));
     if (requestedPackageVersion === currentPackageJson.version) {
