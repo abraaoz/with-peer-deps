@@ -28,7 +28,7 @@ function isInstalled(packageName) {
 
 function installPackages(packages) {
   const packagesString = packages.join(" ");
-  return runSync(`yarn add ${packagesString}`);
+  return runSync(`yarn add ${packagesString} --cwd ${process.cwd()}`);
 }
 
 function installPackage(package) {
@@ -63,7 +63,7 @@ function removePackages(packages) {
     return;
   }
   const packagesString = installedPackages.join(" ");
-  return runSync(`yarn remove ${packagesString}`);
+  return runSync(`yarn remove ${packagesString} --cwd ${process.cwd()}`);
 }
 
 function getPackageListWithVersions(packagesObj) {
