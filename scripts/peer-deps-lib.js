@@ -58,7 +58,7 @@ function removePackages(packages) {
     return;
   }
   const packagesString = installedPackages.join(" ");
-  return runSync(`yarn remove ${packagesString}}`);
+  return runSync(`yarn remove ${packagesString}`);
 }
 
 function getPackageListWithVersions(packagesObj) {
