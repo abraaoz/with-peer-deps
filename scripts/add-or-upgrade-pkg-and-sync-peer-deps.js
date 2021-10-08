@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 const chalk = require('chalk');
 const { toJson } = require('really-relaxed-json');
 
@@ -6,19 +5,11 @@ const {
   runSync, getPackageListWithVersions, removePackages, installPackage, installPackages, getNameAndVersion,
 } = require('./peer-deps-lib');
 
-function addOrUpgradePkgAndSyncPeerDeps() {
-  let packageName = process.argv[2];
-
-  if (!packageName) {
-    console.log(chalk.bgRed('The package name is required'));
-    process.exitCode = 1;
-    return;
-  }
-
+function addOrUpgradePkgAndSyncPeerDeps(packageName) {
   const latestPackageVersion = runSync(`npm info ${packageName} version`).stdout.trim();
   if (latestPackageVersion === '') {
     console.log(chalk.bgRed(`The package ${packageName} was not found in the available repositories`));
-    process.exitCode = 2;
+    process.exitCode = 3;
     return;
   }
 
@@ -65,4 +56,6 @@ function addOrUpgradePkgAndSyncPeerDeps() {
   }
 }
 
-addOrUpgradePkgAndSyncPeerDeps();
+module.exports = {
+  addOrUpgradePkgAndSyncPeerDeps
+}

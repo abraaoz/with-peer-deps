@@ -1,17 +1,8 @@
-#!/usr/bin/env node
 const chalk = require('chalk');
 
 const { removePackages } = require('./peer-deps-lib');
 
-function removePkgWithPeerDeps() {
-  const packageName = process.argv[2];
-
-  if (!packageName) {
-    console.log(chalk.bgRed('The package name is required'));
-    process.exitCode = 1;
-    return;
-  }
-
+function removePkgWithPeerDeps(packageName) {
   try {
     const currentPackageJson = require(`${packageName}/package.json`);
     const packagesToRemove = [
@@ -24,4 +15,6 @@ function removePkgWithPeerDeps() {
   }
 }
 
-removePkgWithPeerDeps();
+module.exports = {
+  removePkgWithPeerDeps
+}

@@ -5,11 +5,8 @@
   "author": "abraao.zaidan@gmail.com",
   "license": "MIT",
   "private": false,
-  "main": "index.js",
   "bin": {
-    "with-peer-deps": "./index.js",
-    "add": "./scripts/add-or-upgrade-pkg-and-sync-peer-deps.js",
-    "remove": "./scripts/remove-pkg-with-peer-deps.js"
+    "with-peer-deps": "./scripts/with-peer-deps.js"
   },
   "dependencies": {
     "chalk": "^4.1.2",
