@@ -1,3 +1,4 @@
+const fs = require('fs');
 const chalk = require('chalk');
 
 const { removePackages } = require('./peer-deps-lib');
