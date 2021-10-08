@@ -9,19 +9,19 @@ This tool allows JavaScript developers to install and uninstall dependencies con
 To **install a dependency** and its peerDependencies as local dependencies:
 
 ```bash
-npx -p with-peer-deps@latest add <anyPackageName>
+npx with-peer-deps@latest add <anyPackageName>
 ```
 
 To **upgrade or downgrade an already installed dependency** to a specific version and syncronize its peerDependencies as local dependencies:
 
 ```bash
-npx -p with-peer-deps@latest add <anyPackageName@desiredVersion>
+npx with-peer-deps@latest add <anyPackageName@desiredVersion>
 ```
 
 To **uninstall a dependency** and its peerDependencies from local dependencies:
 
 ```bash
-npx -p with-peer-deps@latest remove <anyPackageName>
+npx with-peer-deps@latest remove <anyPackageName>
 ```
 
 ## Use case
@@ -36,7 +36,7 @@ When we want to install an X dependency that contains several peerDependencies i
   "version": "0.0.1",
   "dependencies": {
     "my-design-system": "0.0.3",
-    "react-native-linear-gradient": "2.5.6" // <-- this will be automatically appended when you add my-design-system using `npx -p with-peer-deps@latest add my-design-system`
+    "react-native-linear-gradient": "2.5.6" // <-- this will be automatically appended when you add my-design-system using `npx with-peer-deps@latest add my-design-system`
   }
 }
 ```
