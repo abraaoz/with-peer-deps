@@ -1,10 +1,11 @@
 {
   "name": "with-peer-deps",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "repository": "https://github.com/abraaoz/with-peer-deps",
   "author": "abraao.zaidan@gmail.com",
   "license": "MIT",
   "private": false,
+  "main": "index.js",
   "bin": {
     "add": "scripts/add-or-upgrade-pkg-and-sync-peer-deps.js",
     "remove": "scripts/remove-pkg-with-peer-deps.js"
