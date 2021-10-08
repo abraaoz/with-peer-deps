@@ -11,6 +11,7 @@ function runSync(cmd, verbose = true) {
   console.log(`Running ${chalk.yellow(cmd)}`);
   const args = spawnargs(cmd);
   const process = spawnSync(args[0], args.slice(1), {
+    shell: true,
     encoding: "utf8",
   });
   if (verbose) {
