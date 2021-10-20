@@ -24,7 +24,7 @@ function isInstalled(packageName) {
 
 function installPackages(packages, dev = false) {
   const packagesString = packages.join(" ");
-  const command = `yarn add ${packagesString} --emoji true`;
+  let command = `yarn add ${packagesString}`;
   if (dev) {
     command += " --dev";
   }
@@ -63,7 +63,7 @@ function removePackages(packages) {
     return;
   }
   const packagesString = installedPackages.join(" ");
-  return runSync(`yarn remove ${packagesString} --emoji true`);
+  return runSync(`yarn remove ${packagesString}`);
 }
 
 function getPackageListWithVersions(packagesObj) {
