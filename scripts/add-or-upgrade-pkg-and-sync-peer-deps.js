@@ -1,9 +1,14 @@
-const fs = require('fs');
 const chalk = require('chalk');
 const { toJson } = require('really-relaxed-json');
 
 const {
-  runSync, getPackageListWithVersions, removePackages, installPackage, installPackages, getNameAndVersion,
+  runSync,
+  getPackageListWithVersions,
+  removePackages,
+  installPackage,
+  installPackages,
+  getNameAndVersion,
+  getCurrentPackageJson
 } = require('./peer-deps-lib');
 
 function addOrUpgradePkgAndSyncPeerDeps(packageName) {
@@ -28,9 +33,7 @@ function addOrUpgradePkgAndSyncPeerDeps(packageName) {
   const peerDeps = JSON.parse(toJson(npmInfo.stdout));
   const packagesToInstall = getPackageListWithVersions(peerDeps);
   try {
-    const currentPackageJsonPath = `${process.cwd()}/node_modules/${packageName}/package.json`;
-    console.log(`Trying to read the file ${chalk.yellow(currentPackageJsonPath)}`);
-    const currentPackageJson = JSON.parse(fs.readFileSync(currentPackageJsonPath));
+    const currentPackageJson = getCurrentPackageJson(packageName);
     const currentPackageNameWithVersion = `${packageName}@${currentPackageJson.version}`;
     const packagesToRemove = getPackageListWithVersions(currentPackageJson.peerDependencies).filter((package) => !packagesToInstall.includes(package));
     if (requestedPackageVersion === currentPackageJson.version) {
@@ -53,8 +56,15 @@ function addOrUpgradePkgAndSyncPeerDeps(packageName) {
     installPackage(requestedPackageNameWithVersion);
   } finally {
     if (packagesToInstall.length > 0) {
-      console.log(`Installing package ${chalk.green(requestedPackageNameWithVersion)} peerDependencies...`);
+      console.log(`Installing package ${chalk.green(requestedPackageNameWithVersion)} peerDependencies as local dependencies...`);
       installPackages(packagesToInstall);
+    }
+    const currentPackageJson = getCurrentPackageJson(packageName, false);
+    const peerDevDependencies = currentPackageJson.peerDevDependencies || {};
+    const devPackagesToInstall = getPackageListWithVersions(peerDevDependencies);
+    if(devPackagesToInstall.length > 0) {
+      console.log(`Installing package ${chalk.green(requestedPackageNameWithVersion)} peerDevDependencies as local devDependencies...`);
+      installPackages(devPackagesToInstall, true);
     }
   }
 }

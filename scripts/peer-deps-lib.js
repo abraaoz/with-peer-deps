@@ -1,3 +1,4 @@
+const fs = require("fs");
 const chalk = require("chalk");
 const { spawnSync } = require("child_process");
 const spawnargs = require("spawn-args");
@@ -21,9 +22,13 @@ function isInstalled(packageName) {
   return !notInstalled;
 }
 
-function installPackages(packages) {
+function installPackages(packages, dev = false) {
   const packagesString = packages.join(" ");
-  return runSync(`yarn add ${packagesString}`);
+  const command = `yarn add ${packagesString} --emoji true`;
+  if (dev) {
+    command += " --dev";
+  }
+  return runSync(command);
 }
 
 function installPackage(package) {
@@ -58,13 +63,23 @@ function removePackages(packages) {
     return;
   }
   const packagesString = installedPackages.join(" ");
-  return runSync(`yarn remove ${packagesString}`);
+  return runSync(`yarn remove ${packagesString} --emoji true`);
 }
 
 function getPackageListWithVersions(packagesObj) {
   return Object.entries(packagesObj).map(
     (package) => `${package[0]}@${package[1]}`
   );
+}
+
+function getCurrentPackageJson(packageName, verbose = true) {
+  const currentPackageJsonPath = `${process.cwd()}/node_modules/${packageName}/package.json`;
+  if (verbose) {
+    console.log(
+      `Trying to read the file ${chalk.yellow(currentPackageJsonPath)}`
+    );
+  }
+  return JSON.parse(fs.readFileSync(currentPackageJsonPath));
 }
 
 module.exports = {
@@ -75,4 +90,5 @@ module.exports = {
   getNameAndVersion,
   removePackages,
   getPackageListWithVersions,
+  getCurrentPackageJson,
 };
