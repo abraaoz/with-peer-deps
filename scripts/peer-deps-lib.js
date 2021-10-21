@@ -66,8 +66,12 @@ function removePackages(packages) {
   return runSync(`yarn remove ${packagesString}`);
 }
 
+function getPackageListWithoutVersions(packagesObj) {
+  return Object.keys(packagesObj || {});
+}
+
 function getPackageListWithVersions(packagesObj) {
-  return Object.entries(packagesObj).map(
+  return Object.entries(packagesObj || {}).map(
     (package) => `${package[0]}@${package[1]}`
   );
 }
@@ -82,6 +86,24 @@ function getCurrentPackageJson(packageName, verbose = true) {
   return JSON.parse(fs.readFileSync(currentPackageJsonPath));
 }
 
+function getMessage(messageArray) {
+  switch (messageArray.length) {
+    case 1:
+      return `${messageArray[0]}...`;
+    case 2:
+      return `${messageArray[0]} ${messageArray[1]}...`;
+    default:
+      return (
+        messageArray[0] +
+        " " +
+        messageArray.slice(1, -1).join(", ") +
+        " and " +
+        messageArray[messageArray.length - 1] +
+        "..."
+      );
+  }
+}
+
 module.exports = {
   runSync,
   isInstalled,
@@ -89,6 +111,8 @@ module.exports = {
   installPackage,
   getNameAndVersion,
   removePackages,
+  getPackageListWithoutVersions,
   getPackageListWithVersions,
   getCurrentPackageJson,
+  getMessage,
 };

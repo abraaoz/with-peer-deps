@@ -1,16 +1,21 @@
-const fs = require('fs');
 const chalk = require('chalk');
 
-const { removePackages } = require('./peer-deps-lib');
+const {
+  removePackages,
+  getPackageListWithoutVersions,
+  getCurrentPackageJson,
+} = require('./peer-deps-lib');
 
 function removePkgWithPeerDeps(packageName) {
   try {
-    const currentPackageJsonPath = `${process.cwd()}/node_modules/${packageName}/package.json`;
-    console.log(`Trying to read the file ${chalk.yellow(currentPackageJsonPath)}`);
-    const currentPackageJson = JSON.parse(fs.readFileSync(currentPackageJsonPath));
+    const currentPackageJson = getCurrentPackageJson(packageName);
+    const currentPeerDeps = getPackageListWithoutVersions(currentPackageJson.peerDependencies);
+    const currentPeerDevDeps = getPackageListWithoutVersions(currentPackageJson.peerDevDependencies);
+
     const packagesToRemove = [
       packageName,
-      ...Object.keys(currentPackageJson.peerDependencies),
+      ...currentPeerDeps,
+      ...currentPeerDevDeps,
     ];
     removePackages(packagesToRemove);
   } catch {

@@ -3,12 +3,14 @@ const { toJson } = require('really-relaxed-json');
 
 const {
   runSync,
+  getPackageListWithoutVersions,
   getPackageListWithVersions,
   removePackages,
   installPackage,
   installPackages,
   getNameAndVersion,
-  getCurrentPackageJson
+  getCurrentPackageJson,
+  getMessage,
 } = require('./peer-deps-lib');
 
 function addOrUpgradePkgAndSyncPeerDeps(packageName) {
@@ -29,42 +31,65 @@ function addOrUpgradePkgAndSyncPeerDeps(packageName) {
   }
 
   const requestedPackageNameWithVersion = `${packageName}@${requestedPackageVersion}`;
-  const npmInfo = runSync(`npm info ${requestedPackageNameWithVersion} peerDependencies`);
-  const peerDeps = JSON.parse(toJson(npmInfo.stdout));
-  const packagesToInstall = getPackageListWithVersions(peerDeps);
+
+  const npmInfoPeerDeps = runSync(`npm info ${requestedPackageNameWithVersion} peerDependencies`);
+  const peerDeps = JSON.parse(toJson(npmInfoPeerDeps.stdout || '{}'));
+
+  const npmInfoPeerDevDeps = runSync(`npm info ${requestedPackageNameWithVersion} peerDevDependencies`);
+  const peerDevDeps = JSON.parse(toJson(npmInfoPeerDevDeps.stdout || '{}'));
+
   try {
     const currentPackageJson = getCurrentPackageJson(packageName);
     const currentPackageNameWithVersion = `${packageName}@${currentPackageJson.version}`;
-    const packagesToRemove = getPackageListWithVersions(currentPackageJson.peerDependencies).filter((package) => !packagesToInstall.includes(package));
+
+    const packagesToInstallAsDepsWithoutVersions = getPackageListWithoutVersions(peerDeps);
+    const currentPeerDeps = getPackageListWithoutVersions(currentPackageJson.peerDependencies);
+    const depsToRemove = currentPeerDeps.filter((package) => !packagesToInstallAsDepsWithoutVersions.includes(package));
+
+    const packagesToInstallAsDevDepsWithoutVersions = getPackageListWithoutVersions(peerDevDeps);
+    const currentPeerDevDeps = getPackageListWithoutVersions(currentPackageJson.peerDevDependencies);
+    const devDepsToRemove = currentPeerDevDeps.filter((package) => !packagesToInstallAsDevDepsWithoutVersions.includes(package));
+
     if (requestedPackageVersion === currentPackageJson.version) {
       console.log(`The package ${chalk.green(currentPackageNameWithVersion)} is already in the requested version`);
-      if (packagesToRemove.length > 0) {
-        console.log('Removing inconsistent peerDependencies...');
+      const packagesToRemove = [...depsToRemove, ...devDepsToRemove];
+      if(packagesToRemove.length > 0) {
+        let messageArray = ['Removing'];
+        if (depsToRemove.length > 0) {
+          messageArray.push('inconsistent peerDependencies');
+        }
+        if (devDepsToRemove.length > 0) {
+          messageArray.push('inconsistent peerDevDependencies');
+        }
+        console.log(getMessage(messageArray));
         removePackages(packagesToRemove);
       }
     } else {
-      let message = `A divergent version of the package ${chalk.red(currentPackageNameWithVersion)} has been detected, removing the package`;
-      if (packagesToRemove.length > 0) {
-        message += ' and inconsistent peerDependencies...';
+      console.log(`A divergent version of the package ${chalk.red(currentPackageNameWithVersion)} has been detected`);
+      let messageArray = ['Removing', 'the package'];
+      if (depsToRemove.length > 0) {
+        messageArray.push('inconsistent peerDependencies');
       }
-      console.log(message);
-      packagesToRemove.push(currentPackageNameWithVersion);
-      removePackages(packagesToRemove);
+      if (devDepsToRemove.length > 0) {
+        messageArray.push('inconsistent peerDevDependencies');
+      }
+      console.log(getMessage(messageArray));
+      removePackages([currentPackageNameWithVersion, ...depsToRemove, ...devDepsToRemove]);
       installPackage(requestedPackageNameWithVersion);
     }
   } catch {
     installPackage(requestedPackageNameWithVersion);
   } finally {
-    if (packagesToInstall.length > 0) {
+    const packagesToInstallAsDepsWithVersions = getPackageListWithVersions(peerDeps);
+    if (packagesToInstallAsDepsWithVersions.length > 0) {
       console.log(`Installing package ${chalk.green(requestedPackageNameWithVersion)} peerDependencies as local dependencies...`);
-      installPackages(packagesToInstall);
+      installPackages(packagesToInstallAsDepsWithVersions);
     }
-    const currentPackageJson = getCurrentPackageJson(packageName, false);
-    const peerDevDependencies = currentPackageJson.peerDevDependencies || {};
-    const devPackagesToInstall = getPackageListWithVersions(peerDevDependencies);
-    if(devPackagesToInstall.length > 0) {
+
+    const packagesToInstallAsDevDepsWithVersions = getPackageListWithVersions(peerDevDeps);
+    if (packagesToInstallAsDevDepsWithVersions.length > 0) {
       console.log(`Installing package ${chalk.green(requestedPackageNameWithVersion)} peerDevDependencies as local devDependencies...`);
-      installPackages(devPackagesToInstall, true);
+      installPackages(packagesToInstallAsDevDepsWithVersions, true);
     }
   }
 }
