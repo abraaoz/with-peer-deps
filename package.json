@@ -1,6 +1,6 @@
 {
   "name": "with-peer-deps",
-  "version": "0.0.26",
+  "version": "0.0.28",
   "repository": "https://github.com/abraaoz/with-peer-deps",
   "author": "abraao.zaidan@gmail.com",
   "license": "MIT",
@@ -12,5 +12,14 @@
     "chalk": "^4.1.2",
     "really-relaxed-json": "^0.3.1",
     "spawn-args": "^0.2.0"
-  }
+  },
+  "keywords": [
+    "yarn",
+    "install",
+    "peerdeps",
+    "dependencies",
+    "devDependencies",
+    "peerDependencies",
+    "peerDevDependencies"
+  ]
 }
