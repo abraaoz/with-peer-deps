@@ -18,6 +18,12 @@ To **upgrade or downgrade an already installed dependency** to a specific versio
 npx with-peer-deps@latest add <anyPackageName@desiredVersion>
 ```
 
+If you are using `yarn link` for the installed dependencies, you must append `--ignore-node-modules` to resolve the installed version using only the package.json declared version (ignore link):
+
+```bash
+npx with-peer-deps@latest add <anyPackageName@desiredVersion> --ignore-node-modules
+```
+
 To **uninstall a dependency**, its `peerDependencies` from local `dependencies` and its `peerDevDependencies` from local `devDependencies`:
 
 ```bash

@@ -18,9 +18,11 @@ function withPeerDeps() {
     return;
   }
 
+  const ignoreNodeModules = process.argv[4] === '--ignore-node-modules';
+
   switch(command) {
     case 'add':
-      addOrUpgradePkgAndSyncPeerDeps(packageName);
+      addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules);
       break;
     case 'remove':
       removePkgWithPeerDeps(packageName);

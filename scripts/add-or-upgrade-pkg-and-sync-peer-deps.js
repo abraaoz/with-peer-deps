@@ -13,7 +13,7 @@ const {
   getMessage,
 } = require('./peer-deps-lib');
 
-function addOrUpgradePkgAndSyncPeerDeps(packageName) {
+function addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules) {
   const latestPackageVersion = runSync(`npm info ${packageName} version`).stdout.trim();
   if (latestPackageVersion === '') {
     console.log(chalk.bgRed(`The package ${packageName} was not found in the available repositories`));
@@ -39,7 +39,26 @@ function addOrUpgradePkgAndSyncPeerDeps(packageName) {
   const peerDevDeps = JSON.parse(toJson(npmInfoPeerDevDeps.stdout || '{}'));
 
   try {
-    const currentPackageJson = getCurrentPackageJson(packageName);
+    let currentPackageJson;
+    if(ignoreNodeModules) {
+      const ownPackageJson = getCurrentPackageJson('..');
+      const installedPackageVersion = (ownPackageJson.dependencies[packageName] || ownPackageJson.devDependencies[packageName] || '0.0.1').replace('^', '');
+      const installedPackageNameWithVersion = `${packageName}@${installedPackageVersion}`;
+
+      const _npmInfoPeerDeps = runSync(`npm info ${installedPackageNameWithVersion} peerDependencies`);
+      const _peerDeps = JSON.parse(toJson(_npmInfoPeerDeps.stdout || '{}'));
+
+      const _npmInfoPeerDevDeps = runSync(`npm info ${installedPackageNameWithVersion} peerDevDependencies`);
+      const _peerDevDeps = JSON.parse(toJson(_npmInfoPeerDevDeps.stdout || '{}'));
+
+      currentPackageJson = {
+        version: installedPackageVersion,
+        peerDependencies: _peerDeps,
+        peerDevDependencies: _peerDevDeps,
+      };
+    } else {
+      currentPackageJson = getCurrentPackageJson(packageName);
+    }
     const currentPackageNameWithVersion = `${packageName}@${currentPackageJson.version}`;
 
     const packagesToInstallAsDepsWithoutVersions = getPackageListWithoutVersions(peerDeps);
