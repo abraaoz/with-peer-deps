@@ -18,11 +18,15 @@ function withPeerDeps() {
     return;
   }
 
-  const ignoreNodeModules = process.argv[4] === '--ignore-node-modules';
+  const ignoreNodeModulesFlag = '--ignore-node-modules';
+  const ignoreNodeModules = process.argv[4] === ignoreNodeModulesFlag || process.argv[5] === ignoreNodeModulesFlag;
+
+  const setResolutionFlag = '--set-resolution';
+  const setResolution = process.argv[4] === setResolutionFlag || process.argv[5] === setResolutionFlag;
 
   switch(command) {
     case 'add':
-      addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules);
+      addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules, setResolution);
       break;
     case 'remove':
       removePkgWithPeerDeps(packageName);

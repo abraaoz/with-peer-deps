@@ -77,7 +77,9 @@ function getPackageListWithVersions(packagesObj) {
 }
 
 function getCurrentPackageJson(packageName, verbose = true) {
-  const currentPackageJsonPath = `${process.cwd()}/node_modules/${packageName}/package.json`;
+  const currentPackageJsonPath = fs.realpathSync(
+    `${process.cwd()}/node_modules/${packageName}/package.json`
+  );
   if (verbose) {
     console.log(
       `Trying to read the file ${chalk.yellow(currentPackageJsonPath)}`
@@ -104,6 +106,26 @@ function getMessage(messageArray) {
   }
 }
 
+function setResolution(package, version) {
+  console.log(
+    `Setting resolution ${chalk.yellow(`${package}: ${version}`)}`
+  );
+  const packageJsonPath = `${process.cwd()}/package.json`;
+  const packageJsonObj = JSON.parse(
+    fs.readFileSync(packageJsonPath, { encoding: "utf8" }) || '{}'
+  );
+  if (!packageJsonObj) {
+    return;
+  }
+  packageJsonObj.resolutions = packageJsonObj.resolutions || {};
+  packageJsonObj.resolutions[package] = version;
+  packageJsonStr = JSON.stringify(packageJsonObj, null, 2).replace(
+    /\n/g,
+    "\r\n"
+  );
+  fs.writeFileSync(packageJsonPath, packageJsonStr, { encoding: "utf8" });
+}
+
 module.exports = {
   runSync,
   isInstalled,
@@ -115,4 +137,5 @@ module.exports = {
   getPackageListWithVersions,
   getCurrentPackageJson,
   getMessage,
+  setResolution,
 };

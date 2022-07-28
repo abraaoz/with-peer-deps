@@ -11,9 +11,10 @@ const {
   getNameAndVersion,
   getCurrentPackageJson,
   getMessage,
+  setResolution,
 } = require('./peer-deps-lib');
 
-function addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules) {
+function addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules, _setResolution) {
   const latestPackageVersion = runSync(`npm info ${packageName} version`).stdout.trim();
   if (latestPackageVersion === '') {
     console.log(chalk.bgRed(`The package ${packageName} was not found in the available repositories`));
@@ -109,6 +110,10 @@ function addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules) {
     if (packagesToInstallAsDevDepsWithVersions.length > 0) {
       console.log(`Installing package ${chalk.green(requestedPackageNameWithVersion)} peerDevDependencies as local devDependencies...`);
       installPackages(packagesToInstallAsDevDepsWithVersions, true);
+    }
+
+    if (_setResolution) {
+      setResolution(packageName, requestedPackageVersion);
     }
   }
 }

@@ -24,6 +24,8 @@ If you are using `yarn link` for the installed dependencies, you must append `--
 npx with-peer-deps@latest add <anyPackageName@desiredVersion> --ignore-node-modules
 ```
 
+You can also append `--set-resolution` to save the specified package version in the package.json `resolutions` section.
+
 To **uninstall a dependency**, its `peerDependencies` from local `dependencies` and its `peerDevDependencies` from local `devDependencies`:
 
 ```bash
