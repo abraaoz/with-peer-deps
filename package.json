@@ -4,6 +4,7 @@
   "repository": "https://github.com/abraaoz/with-peer-deps",
   "author": "abraao.zaidan@gmail.com",
   "license": "MIT",
+  "type": "module",
   "private": false,
   "bin": {
     "with-peer-deps": "./scripts/with-peer-deps.js"
@@ -11,7 +12,8 @@
   "dependencies": {
     "chalk": "^4.1.2",
     "really-relaxed-json": "^0.3.1",
-    "spawn-args": "^0.2.0"
+    "spawn-args": "^0.2.0",
+    "to-semver": "^4.0.0"
   },
   "keywords": [
     "yarn",

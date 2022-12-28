@@ -12,6 +12,8 @@ To **install a dependency** and its `peerDependencies` as local `dependencies` a
 npx with-peer-deps@latest add <anyPackageName>
 ```
 
+You can also append `--include-prereleases` to consider versions like `1.2.3-alpha.3`.
+
 To **upgrade or downgrade an already installed dependency** to a specific version and syncronize its `peerDependencies` as local `dependencies` and its `peerDevDependencies` as local `devDependencies`:
 
 ```bash

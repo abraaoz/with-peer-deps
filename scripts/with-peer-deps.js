@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-const chalk = require("chalk");
-const { addOrUpgradePkgAndSyncPeerDeps } = require("./add-or-upgrade-pkg-and-sync-peer-deps");
-const { removePkgWithPeerDeps } = require("./remove-pkg-with-peer-deps");
+import chalk from "chalk";
+import { addOrUpgradePkgAndSyncPeerDeps } from "./add-or-upgrade-pkg-and-sync-peer-deps.js";
+import { removePkgWithPeerDeps } from "./remove-pkg-with-peer-deps.js";
 
 function withPeerDeps() {
   const command = process.argv[2];
@@ -19,14 +19,17 @@ function withPeerDeps() {
   }
 
   const ignoreNodeModulesFlag = '--ignore-node-modules';
-  const ignoreNodeModules = process.argv[4] === ignoreNodeModulesFlag || process.argv[5] === ignoreNodeModulesFlag;
+  const ignoreNodeModules = Boolean(process.argv.find((arg) => arg === ignoreNodeModulesFlag));
 
   const setResolutionFlag = '--set-resolution';
-  const setResolution = process.argv[4] === setResolutionFlag || process.argv[5] === setResolutionFlag;
+  const setResolution = Boolean(process.argv.find((arg) => arg === setResolutionFlag));
+
+  const includePrereleasesFlag = '--include-prereleases';
+  const includePrereleases = Boolean(process.argv.find((arg) => arg === includePrereleasesFlag));
 
   switch(command) {
     case 'add':
-      addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules, setResolution);
+      addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules, setResolution, includePrereleases);
       break;
     case 'remove':
       removePkgWithPeerDeps(packageName);

@@ -1,12 +1,12 @@
-const chalk = require('chalk');
+import chalk from 'chalk';
 
-const {
+import {
   removePackages,
   getPackageListWithoutVersions,
   getCurrentPackageJson,
-} = require('./peer-deps-lib');
+} from './peer-deps-lib.js';
 
-function removePkgWithPeerDeps(packageName) {
+export function removePkgWithPeerDeps(packageName) {
   try {
     const currentPackageJson = getCurrentPackageJson(packageName);
     const currentPeerDeps = getPackageListWithoutVersions(currentPackageJson.peerDependencies);
@@ -21,8 +21,4 @@ function removePkgWithPeerDeps(packageName) {
   } catch {
     console.log(`The package ${chalk.red(packageName)} was not found in the node_modules folder. Run the command ${chalk.yellow('yarn')} and try again.`);
   }
-}
-
-module.exports = {
-  removePkgWithPeerDeps
 }

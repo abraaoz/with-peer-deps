@@ -1,9 +1,9 @@
-const fs = require("fs");
-const chalk = require("chalk");
-const { spawnSync } = require("child_process");
-const spawnargs = require("spawn-args");
+import fs from "fs";
+import chalk from "chalk";
+import spawnargs from "spawn-args";
+import { spawnSync } from "child_process";
 
-function runSync(cmd, verbose = true) {
+export function runSync(cmd, verbose = true) {
   console.log(`Running ${chalk.yellow(cmd)}`);
   const args = spawnargs(cmd);
   const process = spawnSync(args[0], args.slice(1), {
@@ -16,13 +16,13 @@ function runSync(cmd, verbose = true) {
   return process;
 }
 
-function isInstalled(packageName) {
+export function isInstalled(packageName) {
   const npmList = runSync(`npm list ${packageName} --depth=0`, false);
   const notInstalled = npmList.stdout.trim().endsWith("`-- (empty)");
   return !notInstalled;
 }
 
-function installPackages(packages, dev = false) {
+export function installPackages(packages, dev = false) {
   const packagesString = packages.join(" ");
   let command = `yarn add ${packagesString}`;
   if (dev) {
@@ -31,14 +31,14 @@ function installPackages(packages, dev = false) {
   return runSync(command);
 }
 
-function installPackage(package) {
-  console.log(`Installing the package ${chalk.yellow(package)}...`);
-  installPackages([package]);
+export function installPackage(_package) {
+  console.log(`Installing the package ${chalk.yellow(_package)}...`);
+  installPackages([_package]);
 }
 
-function getNameAndVersion(package) {
+export function getNameAndVersion(_package) {
   const hasVersion = new RegExp("^(.+)@(.+?)$");
-  const hasVersionResult = hasVersion.exec(package);
+  const hasVersionResult = hasVersion.exec(_package);
   if (hasVersionResult) {
     return {
       name: hasVersionResult[1],
@@ -46,15 +46,15 @@ function getNameAndVersion(package) {
     };
   }
   return {
-    name: package,
+    name: _package,
     version: null,
   };
 }
 
-function removePackages(packages) {
+export function removePackages(packages) {
   console.log("Checking the presence of the packages to be removed...");
-  const packagesWithoutVersions = packages.map((package) => {
-    const { name } = getNameAndVersion(package);
+  const packagesWithoutVersions = packages.map((_package) => {
+    const { name } = getNameAndVersion(_package);
     return name;
   });
   const installedPackages = packagesWithoutVersions.filter(isInstalled);
@@ -66,17 +66,17 @@ function removePackages(packages) {
   return runSync(`yarn remove ${packagesString}`);
 }
 
-function getPackageListWithoutVersions(packagesObj) {
+export function getPackageListWithoutVersions(packagesObj) {
   return Object.keys(packagesObj || {});
 }
 
-function getPackageListWithVersions(packagesObj) {
+export function getPackageListWithVersions(packagesObj) {
   return Object.entries(packagesObj || {}).map(
-    (package) => `${package[0]}@${package[1]}`
+    (_package) => `${_package[0]}@${_package[1]}`
   );
 }
 
-function getCurrentPackageJson(packageName, verbose = true) {
+export function getCurrentPackageJson(packageName, verbose = true) {
   const currentPackageJsonPath = fs.realpathSync(
     `${process.cwd()}/node_modules/${packageName}/package.json`
   );
@@ -88,7 +88,7 @@ function getCurrentPackageJson(packageName, verbose = true) {
   return JSON.parse(fs.readFileSync(currentPackageJsonPath));
 }
 
-function getMessage(messageArray) {
+export function getMessage(messageArray) {
   switch (messageArray.length) {
     case 1:
       return `${messageArray[0]}...`;
@@ -106,9 +106,9 @@ function getMessage(messageArray) {
   }
 }
 
-function setResolution(package, version) {
+export function setResolution(_package, version) {
   console.log(
-    `Setting resolution ${chalk.yellow(`${package}: ${version}`)}`
+    `Setting resolution ${chalk.yellow(`${_package}: ${version}`)}`
   );
   const packageJsonPath = `${process.cwd()}/package.json`;
   const packageJsonObj = JSON.parse(
@@ -118,24 +118,10 @@ function setResolution(package, version) {
     return;
   }
   packageJsonObj.resolutions = packageJsonObj.resolutions || {};
-  packageJsonObj.resolutions[package] = version;
+  packageJsonObj.resolutions[_package] = version;
   packageJsonStr = JSON.stringify(packageJsonObj, null, 2).replace(
     /\n/g,
     "\r\n"
   );
   fs.writeFileSync(packageJsonPath, packageJsonStr, { encoding: "utf8" });
 }
-
-module.exports = {
-  runSync,
-  isInstalled,
-  installPackages,
-  installPackage,
-  getNameAndVersion,
-  removePackages,
-  getPackageListWithoutVersions,
-  getPackageListWithVersions,
-  getCurrentPackageJson,
-  getMessage,
-  setResolution,
-};

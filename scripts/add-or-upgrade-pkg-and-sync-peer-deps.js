@@ -1,7 +1,8 @@
-const chalk = require('chalk');
-const { toJson } = require('really-relaxed-json');
+import chalk from 'chalk';
+import toSemver from 'to-semver';
+import rjson from 'really-relaxed-json';
 
-const {
+import {
   runSync,
   getPackageListWithoutVersions,
   getPackageListWithVersions,
@@ -12,15 +13,17 @@ const {
   getCurrentPackageJson,
   getMessage,
   setResolution,
-} = require('./peer-deps-lib');
+} from './peer-deps-lib.js';
 
-function addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules, _setResolution) {
-  const latestPackageVersion = runSync(`npm info ${packageName} version`).stdout.trim();
-  if (latestPackageVersion === '') {
+export function addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules, _setResolution, includePrereleases) {
+  const availableVersions = JSON.parse(runSync(`npm view ${packageName} versions --json`).stdout.trim());
+  if (availableVersions.error) {
     console.log(chalk.bgRed(`The package ${packageName} was not found in the available repositories`));
     process.exitCode = 3;
     return;
   }
+  const sortedAvailableVersions = toSemver(availableVersions, { includePrereleases });
+  const latestPackageVersion = sortedAvailableVersions[0];
 
   const { name, version } = getNameAndVersion(packageName);
   let requestedPackageVersion;
@@ -33,11 +36,11 @@ function addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules, _setReso
 
   const requestedPackageNameWithVersion = `${packageName}@${requestedPackageVersion}`;
 
-  const npmInfoPeerDeps = runSync(`npm info ${requestedPackageNameWithVersion} peerDependencies`);
-  const peerDeps = JSON.parse(toJson(npmInfoPeerDeps.stdout || '{}'));
+  const npmInfoPeerDeps = runSync(`npm view ${requestedPackageNameWithVersion} peerDependencies`);
+  const peerDeps = JSON.parse(rjson.toJson(npmInfoPeerDeps.stdout || '{}'));
 
-  const npmInfoPeerDevDeps = runSync(`npm info ${requestedPackageNameWithVersion} peerDevDependencies`);
-  const peerDevDeps = JSON.parse(toJson(npmInfoPeerDevDeps.stdout || '{}'));
+  const npmInfoPeerDevDeps = runSync(`npm view ${requestedPackageNameWithVersion} peerDevDependencies`);
+  const peerDevDeps = JSON.parse(rjson.toJson(npmInfoPeerDevDeps.stdout || '{}'));
 
   try {
     let currentPackageJson;
@@ -46,11 +49,11 @@ function addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules, _setReso
       const installedPackageVersion = (ownPackageJson.dependencies[packageName] || ownPackageJson.devDependencies[packageName] || '0.0.1').replace('^', '');
       const installedPackageNameWithVersion = `${packageName}@${installedPackageVersion}`;
 
-      const _npmInfoPeerDeps = runSync(`npm info ${installedPackageNameWithVersion} peerDependencies`);
-      const _peerDeps = JSON.parse(toJson(_npmInfoPeerDeps.stdout || '{}'));
+      const _npmInfoPeerDeps = runSync(`npm view ${installedPackageNameWithVersion} peerDependencies`);
+      const _peerDeps = JSON.parse(rjson.toJson(_npmInfoPeerDeps.stdout || '{}'));
 
-      const _npmInfoPeerDevDeps = runSync(`npm info ${installedPackageNameWithVersion} peerDevDependencies`);
-      const _peerDevDeps = JSON.parse(toJson(_npmInfoPeerDevDeps.stdout || '{}'));
+      const _npmInfoPeerDevDeps = runSync(`npm view ${installedPackageNameWithVersion} peerDevDependencies`);
+      const _peerDevDeps = JSON.parse(rjson.toJson(_npmInfoPeerDevDeps.stdout || '{}'));
 
       currentPackageJson = {
         version: installedPackageVersion,
@@ -64,11 +67,11 @@ function addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules, _setReso
 
     const packagesToInstallAsDepsWithoutVersions = getPackageListWithoutVersions(peerDeps);
     const currentPeerDeps = getPackageListWithoutVersions(currentPackageJson.peerDependencies);
-    const depsToRemove = currentPeerDeps.filter((package) => !packagesToInstallAsDepsWithoutVersions.includes(package));
+    const depsToRemove = currentPeerDeps.filter((_package) => !packagesToInstallAsDepsWithoutVersions.includes(_package));
 
     const packagesToInstallAsDevDepsWithoutVersions = getPackageListWithoutVersions(peerDevDeps);
     const currentPeerDevDeps = getPackageListWithoutVersions(currentPackageJson.peerDevDependencies);
-    const devDepsToRemove = currentPeerDevDeps.filter((package) => !packagesToInstallAsDevDepsWithoutVersions.includes(package));
+    const devDepsToRemove = currentPeerDevDeps.filter((_package) => !packagesToInstallAsDevDepsWithoutVersions.includes(_package));
 
     if (requestedPackageVersion === currentPackageJson.version) {
       console.log(`The package ${chalk.green(currentPackageNameWithVersion)} is already in the requested version`);
@@ -116,8 +119,4 @@ function addOrUpgradePkgAndSyncPeerDeps(packageName, ignoreNodeModules, _setReso
       setResolution(packageName, requestedPackageVersion);
     }
   }
-}
-
-module.exports = {
-  addOrUpgradePkgAndSyncPeerDeps
 }
